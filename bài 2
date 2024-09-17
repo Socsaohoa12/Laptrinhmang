@@ -1,0 +1,58 @@
+import requests
+from bs4 import BeautifulSoup
+import os
+from urllib.parse import urljoin
+
+# URL của trang meme templates
+url = "https://imgflip.com/memetemplates?page=1"
+
+# Gửi yêu cầu HTTP GET để lấy trang web
+response = requests.get(url)
+
+# Kiểm tra nếu yêu cầu thành công (status code 200)
+if response.status_code == 200:
+    # Phân tích nội dung HTML của trang bằng BeautifulSoup
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # Tạo thư mục để lưu hình ảnh nếu chưa có
+    if not os.path.exists('images'):
+        os.makedirs('images')
+
+    # Lưu hình ảnh và tiêu đề (alt text) vào file
+    with open('titles_and_images.txt', 'w', encoding='utf-8') as file:
+        # Tìm tất cả các thẻ div chứa meme template
+        meme_templates = soup.find_all('div', class_='mt-template-container')
+
+        for template in meme_templates:
+            # Lấy thẻ img trong từng meme template
+            img_tag = template.find('img')
+            # Lấy tiêu đề từ thẻ a hoặc thẻ khác
+            title_tag = template.find('h2', class_='mt-title')
+
+            if img_tag and title_tag:
+                img_url = img_tag['src']
+                title = title_tag.get_text(strip=True)
+
+                # Ghi tiêu đề vào file
+                file.write(f"Title: {title}\n")
+
+                # Chuyển đổi liên kết tương đối thành tuyệt đối
+                full_img_url = urljoin(url, img_url)
+
+                # Tải hình ảnh nếu là link hợp lệ
+                if full_img_url.startswith('http'):
+                    try:
+                        img_data = requests.get(full_img_url).content
+                        img_name = os.path.join('images', full_img_url.split('/')[-1])
+
+                        # Lưu ảnh vào thư mục
+                        with open(img_name, 'wb') as img_file:
+                            img_file.write(img_data)
+
+                        file.write(f"Saved Image: {img_name}\n")
+                    except Exception as e:
+                        print(f"Error downloading {full_img_url}: {e}")
+                file.write("\n")
+    print("Finished downloading images and titles.")
+else:
+    print(f"Failed to retrieve the page. Status code: {response.status_code}")
