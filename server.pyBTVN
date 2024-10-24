@@ -1,40 +1,30 @@
 import socket
-import requests
-from bs4 import BeautifulSoup
 
-def get_stock_price(stock_code):
-    url = "https://iboard.ssi.com.vn/"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        # Tìm kiếm thông tin giá cổ phiếu (cần điều chỉnh class phù hợp)
-        stock_info = soup.find('div', {'class': 'stock-info'})  # Thay đổi class cho phù hợp
-        if stock_info:
-            price = stock_info.find('span', {'class': 'current-price'})  # Thay đổi class cho phù hợp
-            if price:
-                return price.text.strip()
-            else:
-                return "Không tìm thấy giá cổ phiếu."
-        else:
-            return "Không tìm thấy thông tin cho mã chứng khoán này."
-    else:
-        return "Không thể kết nối đến trang web."
+# Giả định dữ liệu giá cổ phiếu
+stock_data = {
+    'FPT': '100.000 VND',
+    'VNM': '200.000 VND',
+    'VCB': '300.000 VND'
+}
 
 def start_server():
     host = '127.0.0.1'
     port = 65432
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((host, port))
-        server_socket.listen()
-        print(f"SERVER đang lắng nghe tại {host}:{port}")
-        conn, addr = server_socket.accept()
-        with conn:
-            print(f"Kết nối từ {addr}")
-            data = conn.recv(1024).decode()  # Nhận mã chứng khoán từ client
-            if data:
-                stock_price = get_stock_price(data.upper())
-                conn.sendall(stock_price.encode())
+        server_socket.listen()  # Server bắt đầu lắng nghe
+
+        print(f"Server đang chạy tại {host}:{port}...")
+
+        while True:
+            client_socket, client_address = server_socket.accept()  # Chấp nhận kết nối từ client
+            with client_socket:
+                print(f"Đã kết nối với {client_address}")
+                stock_code = client_socket.recv(1024).decode()  # Nhận mã chứng khoán từ client
+                price = stock_data.get(stock_code.upper(), "Mã chứng khoán không tồn tại")  # Tra cứu giá cổ phiếu
+                client_socket.sendall(price.encode())  # Gửi giá cổ phiếu về cho client
 
 if __name__ == "__main__":
     start_server()
+
