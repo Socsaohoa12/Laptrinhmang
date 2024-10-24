@@ -2,9 +2,9 @@ import socket
 
 # Giả định dữ liệu giá cổ phiếu
 stock_data = {
-    'FPT': '100.000 VND',
-    'VNM': '200.000 VND',
-    'VCB': '300.000 VND'
+    'FPT': '10.00 VND',
+    'VNM': '200.0 VND',
+    'VCB': '30.976 VND'
 }
 
 def start_server():
