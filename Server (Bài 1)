@@ -1,0 +1,27 @@
+import socket
+
+def is_prime(num):
+    if num < 2:
+        return False
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+def handle_client(conn):
+    data = conn.recv(1024).decode()
+    a, b = map(int, data.split())
+    primes = [str(num) for num in range(a, b+1) if is_prime(num)]
+    conn.send(" ".join(primes).encode())
+    conn.close()
+
+def main():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('localhost', 12345))
+    server.listen(5)
+    print("Server is listening on port 12345...")
+    while True:
+        conn, addr = server.accept()
+        handle_client(conn)
+
+main()

@@ -1,0 +1,10 @@
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(('localhost', 12346))
+a = input("Nhập số a: ")
+b = input("Nhập số b: ")
+client.send(f"{a} {b}".encode())
+response = client.recv(1024).decode()
+print("Các số có tổng chữ số bằng 15:", response)
+client.close()

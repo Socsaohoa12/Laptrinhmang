@@ -1,0 +1,17 @@
+import socket
+
+# Khởi tạo client socket
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Kết nối tới server
+client.connect(('localhost', 12347))
+
+# Nhập chuỗi các số thực từ người dùng
+numbers = input("Nhập các số thực, cách nhau bởi khoảng trắng: ")
+# Gửi dữ liệu tới server
+client.send(numbers.encode())
+
+# Nhận kết quả từ server và hiển thị
+response = client.recv(1024).decode()
+print("Chuỗi sắp xếp tăng dần:", response)
+client.close()
+

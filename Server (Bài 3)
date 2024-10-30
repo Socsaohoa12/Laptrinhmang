@@ -1,0 +1,19 @@
+import socket
+
+def handle_client(conn):
+    data = conn.recv(1024).decode()
+    numbers = list(map(float, data.split()))
+    numbers.sort()
+    conn.send(" ".join(map(str, numbers)).encode())
+    conn.close()
+
+def main():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('localhost', 12347))
+    server.listen(5)
+    print("Server is listening on port 12347...")
+    while True:
+        conn, addr = server.accept()
+        handle_client(conn)
+
+main()
