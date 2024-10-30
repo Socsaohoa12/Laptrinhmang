@@ -1,0 +1,9 @@
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(('localhost', 12349))
+number = input("Nhập một số nguyên: ")
+client.send(number.encode())
+response = client.recv(1024).decode()
+print("Tổng các chữ số:", response)
+client.close()

@@ -1,0 +1,9 @@
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(('localhost', 12348))
+numbers = input("Nhập các số thực, cách nhau bởi khoảng trắng: ")
+client.send(numbers.encode())
+response = client.recv(1024).decode()
+print("Số lớn nhất:", response)
+client.close()
