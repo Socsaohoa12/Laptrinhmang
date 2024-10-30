@@ -1,19 +1,27 @@
 import socket
 
 def handle_client(conn):
+    # Nhận dữ liệu từ client
     data = conn.recv(1024).decode()
+    # Chuyển chuỗi dữ liệu thành danh sách các số thực
     numbers = list(map(float, data.split()))
+    # Sắp xếp danh sách số theo thứ tự tăng dần
     numbers.sort()
+    # Gửi lại danh sách đã sắp xếp cho client
     conn.send(" ".join(map(str, numbers)).encode())
     conn.close()
 
 def main():
+    # Khởi tạo server socket
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Gắn IP và cổng cho server
     server.bind(('localhost', 12347))
     server.listen(5)
     print("Server is listening on port 12347...")
     while True:
+        # Chấp nhận kết nối từ client
         conn, addr = server.accept()
+        print(f"Connected by {addr}")
         handle_client(conn)
 
 main()
